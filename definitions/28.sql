@@ -1,3 +1,5 @@
+--query_tipo_de_ean_NUMTP
+
 -- DECLARO VARIABLES
 DECLARE v_rule_id INT64 ;  -- ID de la regla
 DECLARE v_query STRING; -- Consulta de validación, aquí va la lógica de la regla
@@ -6,7 +8,7 @@ DECLARE v_failed INT64; -- Valores que no cumplen con la regla
 DECLARE v_passed FLOAT64; --% calculado entre valores totales y los que no cumplen la regla
 DECLARE v_status STRING; --Status del resultado
 DECLARE v_details STRING; --Detalles de la ejecución
-DECLARE file_name STRING; --Nombre del archivo al
+DECLARE file_name STRING; --Nombre del archivo al bucket
 
 -- DEFINIR ID RULE
 SET v_rule_id = 28;

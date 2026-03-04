@@ -9,3 +9,9 @@ actions:
     dependencyTargets:
     - name: Trigger
     filename: 28.sql
+- operation:
+    name: 6
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: Trigger
+    filename: 6.sql
