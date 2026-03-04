@@ -65,7 +65,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' UMP_VAR: tengo 2 materiales con valor 2, 12420;17882');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Coherencia entre la Unidad de Medida Base (MEINS) y el indicador VABME (UMP_VAR)');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (

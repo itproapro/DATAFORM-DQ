@@ -55,7 +55,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' GRUPO ARTICULOS: ');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validez del grupo de Artículos ');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS(

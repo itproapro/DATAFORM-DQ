@@ -47,7 +47,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, 'TIPO DE EAN: falta ver relaciones...');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, 'Coherencia entre EAN, longitud y tipo.');
 
 
 -- INSERTAR RESULTADO EN LA TABLA

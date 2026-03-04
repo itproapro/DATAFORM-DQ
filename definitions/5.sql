@@ -72,7 +72,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' CENTRO: relación entre el dígito inicial del material y su centro');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Asignación correcta del centro según tipo de material');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO 	cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (

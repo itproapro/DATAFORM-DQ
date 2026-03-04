@@ -61,7 +61,7 @@ SET v_status = CASE
     else 'FAILED'
 END;
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' TIPO MATERIAL: ZMER-ZFRE-ZSEC');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, 'Coherencia entre el tipo de material (MTART) y la codificación interna del número de material (MATNR)');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
