@@ -10,6 +10,12 @@ actions:
     - name: Trigger
     filename: 1.sql
 - operation:
+    name: 2
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: Trigger
+    filename: 2.sql
+- operation:
     name: 3
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
@@ -33,6 +39,12 @@ actions:
     dependencyTargets:
     - name: Trigger
     filename: 7.sql
+- operation:
+    name: 8
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: Trigger
+    filename: 8.sql
 - operation:
     name: 12
     project: cf-esproapro-bic-pro-ou
@@ -99,6 +111,12 @@ actions:
     dependencyTargets:
     - name: Trigger
     filename: 29.sql
+- operation:
+    name: 30
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: Trigger
+    filename: 30.sql
 - operation:
     name: 31
     project: cf-esproapro-bic-pro-ou
