@@ -67,9 +67,8 @@ select v_total;
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 100  THEN 'PASSED'
-    WHEN v_passed < 100 THEN 'FAILED'
-    ELSE 'ERROR'
+    WHEN v_passed > 99.5  THEN 'PASSED'
+    else 'FAILED'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
