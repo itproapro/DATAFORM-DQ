@@ -1,4 +1,4 @@
---query_codigo_agrupador_BISMT
+--query_grupo_articulos_MATKL
 
 -- DECLARO VARIABLES
 DECLARE v_rule_id INT64 ;  -- ID de la regla
@@ -10,31 +10,33 @@ DECLARE v_status STRING; --Status del resultado
 DECLARE v_details STRING; --Detalles de la ejecución
 DECLARE file_name STRING; --Nombre del archivo al bucket
 
-
 -- DEFINIR ID RULE
-SET v_rule_id = 15;
+SET v_rule_id = 12;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: -- Código Agrupador debe tener una longitud de 6 caractéres y al menos un material agrupado (MATNR) y no debe ser nulo.
+-- DEFINIR LA REGLA ASIGNADA A v_query: -- GRUPO DE ARTICULOS --> deben pertenecer a un grupo de SUPPLIER
 SET v_query = '''
   WITH base AS (
   SELECT
     LPAD(CAST(MATNR AS STRING),18,'0') AS MATNR,
-    NULLIF(TRIM(CAST(BISMT AS STRING)),'') AS BISMT,
-    MTART,
+    NULLIF(TRIM(CAST(MATKL AS STRING)),'') AS MATKL,
+    MTART
   FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
 )
 SELECT 
-  COUNT(*)  
+  COUNT(*)
 FROM base
-WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND BISMT IS NULL
+WHERE(
+  (MATKL IS NULL AND MTART IN ('ZMER','ZSEC','ZFRE')) OR (MATKL NOT IN ('SUPPLIER','SYSCO','NO.BRAND','METRO','MAKRO','PAP','CUSTOMER') AND MTART IN ('ZMER','ZSEC','ZFRE')))
 ''';
 
 
 
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
-SET v_total = (SELECT COUNT(*) FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
-WHERE MTART IN ('ZMER','ZFRE', 'ZSEC'));
+SET v_total = (SELECT
+  COUNT(*)
+  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
+  WHERE MTART IN ('ZMER','ZSEC','ZFRE'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
 
@@ -48,16 +50,15 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 95  THEN 'PASSED'
-    WHEN v_passed < 95 THEN 'FAILED'
-    ELSE 'ERROR'
+    WHEN v_passed > 99.5  THEN 'PASSED'
+    else 'FAILED'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' CODIGO AGRUPADOR: ');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' GRUPO ARTICULOS: ');
 
 -- INSERTAR RESULTADO EN LA TABLA
-INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
+INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS(
     RESULT_ID,
     RULE_ID,
     EXECUTION_TIME,
@@ -78,9 +79,10 @@ VALUES (
     v_details
 );
 
+
 IF v_status = 'FAILED' THEN
 SET file_name = CONCAT(
-  'gs://maestromateriales-dataquality-pap/REGLA_DQ_15_MARA_',
+  'gs://maestromateriales-dataquality-pap/REGLA_DQ_12_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
   '_*.csv'
 );
@@ -94,17 +96,18 @@ EXECUTE IMMEDIATE FORMAT("""
     overwrite = true
   )
   AS
-     WITH base AS (
-    SELECT
-        LPAD(CAST(MATNR AS STRING),18,'0') AS MATNR,
-        NULLIF(TRIM(CAST(BISMT AS STRING)),'') AS BISMT,
-        MTART,
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
-    )
-    SELECT 
-    COUNT(*)  
-    FROM base
-    WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND BISMT IS NULL
+    WITH base AS (
+  SELECT
+    LPAD(CAST(MATNR AS STRING),18,'0') AS MATNR,
+    NULLIF(TRIM(CAST(MATKL AS STRING)),'') AS MATKL,
+    MTART
+  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
+  )
+  SELECT 
+    *
+  FROM base
+  WHERE(
+    (MATKL IS NULL AND MTART IN ('ZMER','ZSEC','ZFRE')) OR (MATKL NOT IN ('SUPPLIER','SYSCO','NO.BRAND','METRO','MAKRO','PAP','CUSTOMER') AND MTART IN ('ZMER','ZSEC','ZFRE')))
     order by MATNR;
 """, file_name);
 
