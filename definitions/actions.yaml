@@ -4,8 +4,8 @@ actions:
     project: cf-esproapro-bic-pro-ou
     filename: trigger.sql
 - operation:
-    name: BQT_STG_ODS_0COSTCENTER_TEXT
+    name: 28
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
     - name: Trigger
-    filename: query_1764773494832.sql
+    filename: 28.sql
