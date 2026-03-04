@@ -1,3 +1,5 @@
+---query_centro_WERKS
+
 -- DECLARO VARIABLES
 
 DECLARE v_rule_id INT64 ;  -- ID de la regla
