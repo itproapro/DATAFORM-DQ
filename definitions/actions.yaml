@@ -123,3 +123,34 @@ actions:
     dependencyTargets:
     - name: Trigger
     filename: 31.sql
+- operation:
+    name: barrier
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+      - name: 1
+      - name: 2
+      - name: 3
+      - name: 5
+      - name: 6
+      - name: 7
+      - name: 8
+      - name: 12
+      - name: 13
+      - name: 14
+      - name: 15
+      - name: 18
+      - name: 19
+      - name: 22
+      - name: 25
+      - name: 27
+      - name: 28
+      - name: 29
+      - name: 30
+      - name: 31
+    filename: barrier.sql
+- operation:
+    name: cube
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+      - name: barrier
+    filename: cube.sql
