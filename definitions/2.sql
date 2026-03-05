@@ -86,10 +86,10 @@ EXECUTE IMMEDIATE FORMAT("""
   )
   AS
     SELECT -- identificar registros donde MBRSH <> A
-    COUNT(*)
+    MATNR,
+    MBRSH
     FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
     WHERE MBRSH <> 'A'
-    GROUP BY MATNR
     ORDER BY MATNR DESC;
 """, file_name);
 

@@ -1,0 +1,18 @@
+CREATE OR REPLACE TABLE cf-esproapro-bic-pro-ou.SH_REP.CUBE_DQ as
+SELECT
+a.*, 
+b.RULE_NAME, 
+b.RULE_DESCRIPTION, 
+b.TARGET_TABLE, 
+b.SQL_CONDITION, 
+b.SEVERITY, 
+b.THRESHOLD, 
+b.ACTIVE, 
+b.CREATED_AT, 
+b.UPDATED_AT, 
+b.TABLE, 
+b.TABLE_FIELD, 
+b.TABLE_SOURCE, 
+b.MASTER
+FROM cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS a
+LEFT JOIN cf-esproapro-bic-pro-ou.SH_REP.DIM_DQ_RULES b on a.RULE_ID = b.RULE_ID

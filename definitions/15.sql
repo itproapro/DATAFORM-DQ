@@ -101,7 +101,8 @@ EXECUTE IMMEDIATE FORMAT("""
     FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
     )
     SELECT 
-    COUNT(*)  
+    MTART,
+    BISMT 
     FROM base
     WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND BISMT IS NULL
     order by MATNR;
