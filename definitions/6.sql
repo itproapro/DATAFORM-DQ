@@ -1,4 +1,4 @@
---query_almacen_LGORT
+--query_almacen_LGPRO
 
 -- DECLARO VARIABLES
 DECLARE v_rule_id INT64 ;  -- ID de la regla

@@ -16,17 +16,63 @@ SET v_rule_id = 15;
 
 -- DEFINIR LA REGLA ASIGNADA A v_query: -- Código Agrupador debe tener una longitud de 6 caractéres y al menos un material agrupado (MATNR) y no debe ser nulo.
 SET v_query = '''
-  WITH base AS (
+WITH base AS (
   SELECT
-    LPAD(CAST(MATNR AS STRING),18,'0') AS MATNR,
-    NULLIF(TRIM(CAST(BISMT AS STRING)),'') AS BISMT,
-    MTART,
+    RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
+    BISMT,
+    RIGHT(LPAD(CAST(ZZSUSTITUTO AS STRING),18,'0'),5) AS ZZSUSTITUTO,
   FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
+  WHERE MTART IN ('ZMER','ZSEC','ZFRE')
+),
+
+grupos AS (
+  SELECT
+    BISMT,
+    COUNT(DISTINCT MATNR) AS n_materiales,
+    COUNTIF(ZZSUSTITUTO IS NOT NULL) AS n_switch,
+    ARRAY_AGG(DISTINCT MATNR) AS materiales_agrupados
+  FROM base
+  WHERE BISMT IS NOT NULL
+  GROUP BY BISMT
+),
+
+marcados AS (
+  SELECT
+    b.*,
+    
+    -- Regla 1: BISMT debe tener 6 dígitos numéricos (cuando no es nulo)
+    (BISMT IS NOT NULL
+     AND (LENGTH(CAST(BISMT AS STRING)) != 6
+          OR REGEXP_CONTAINS(CAST(BISMT AS STRING), r'[^0-9]'))) AS formato_bismt,
+    
+    -- Regla 2: tiene ZZSUSTITUTO, BISMT no puede ser nulo/vacío
+    (ZZSUSTITUTO IS NOT NULL
+     AND (BISMT IS NULL OR BISMT = '')) AS bismt_nulo_con_switch,
+    
+    -- Regla 3: por BISMT, debe cumplir n_materiales / n_switch = n-1
+    (b.BISMT IS NOT NULL
+     AND g.BISMT IS NOT NULL
+     AND (
+       (g.n_materiales = 1 AND g.n_switch != 0) OR
+       (g.n_materiales > 1 AND g.n_switch != g.n_materiales - 1)
+     )) AS grupo_n_vs_nmenos1,
+    
+    -- Regla 4: ZZSUSTITUTO debe existir como MATNR dentro del mismo BISMT
+    (b.BISMT IS NOT NULL
+     AND b.ZZSUSTITUTO IS NOT NULL
+     AND (
+       g.materiales_agrupados IS NULL
+       OR NOT b.ZZSUSTITUTO IN UNNEST(g.materiales_agrupados)
+     )) AS switch_fuera_de_grupo
+
+  FROM base b
+  LEFT JOIN grupos g
+    USING (BISMT)
 )
-SELECT 
-  COUNT(*)  
-FROM base
-WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND BISMT IS NULL
+
+SELECT
+  COUNTIF(formato_bismt OR bismt_nulo_con_switch OR grupo_n_vs_nmenos1 OR switch_fuera_de_grupo) AS registros_incorrectos  
+FROM marcados;
 ''';
 
 
@@ -48,8 +94,9 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 99.5  THEN 'PASSED'
-    else 'FAILED'
+    WHEN v_passed > 99  THEN 'PASSED'
+    WHEN v_passed < 99  THEN 'FAILED'
+    else 'ERROR'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
@@ -94,18 +141,62 @@ EXECUTE IMMEDIATE FORMAT("""
   )
   AS
      WITH base AS (
-    SELECT
-        LPAD(CAST(MATNR AS STRING),18,'0') AS MATNR,
-        NULLIF(TRIM(CAST(BISMT AS STRING)),'') AS BISMT,
-        MTART,
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
-    )
-    SELECT 
-    MTART,
-    BISMT 
-    FROM base
-    WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND BISMT IS NULL
-    order by MATNR;
+  SELECT
+    RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
+    BISMT,
+    RIGHT(LPAD(CAST(ZZSUSTITUTO AS STRING),18,'0'),5) AS ZZSUSTITUTO,
+  FROM `cf-esproapro-bic-dev-y5.SH_STG_PROD.bqt_material_attr`
+  WHERE MTART IN ('ZMER','ZSEC','ZFRE')
+),
+
+grupos AS (
+  SELECT
+    BISMT,
+    COUNT(DISTINCT MATNR) AS n_materiales,
+    COUNTIF(ZZSUSTITUTO IS NOT NULL) AS n_switch,
+    ARRAY_AGG(DISTINCT MATNR) AS materiales_agrupados
+  FROM base
+  WHERE BISMT IS NOT NULL
+  GROUP BY BISMT
+),
+
+marcados AS (
+  SELECT
+    b.*,
+    
+    -- Regla 1: BISMT debe tener 6 dígitos numéricos (cuando no es nulo)
+    (BISMT IS NOT NULL
+     AND (LENGTH(CAST(BISMT AS STRING)) != 6
+          OR REGEXP_CONTAINS(CAST(BISMT AS STRING), r'[^0-9]'))) AS formato_bismt,
+    
+    -- Regla 2: tiene ZZSUSTITUTO, BISMT no puede ser nulo/vacío
+    (ZZSUSTITUTO IS NOT NULL
+     AND (BISMT IS NULL OR BISMT = '')) AS bismt_nulo_con_switch,
+    
+    -- Regla 3: por BISMT, debe cumplir n_materiales / n_switch = n-1
+    (b.BISMT IS NOT NULL
+     AND g.BISMT IS NOT NULL
+     AND (
+       (g.n_materiales = 1 AND g.n_switch != 0) OR
+       (g.n_materiales > 1 AND g.n_switch != g.n_materiales - 1)
+     )) AS grupo_n_vs_nmenos1,
+    
+    -- Regla 4: ZZSUSTITUTO debe existir como MATNR dentro del mismo BISMT
+    (b.BISMT IS NOT NULL
+     AND b.ZZSUSTITUTO IS NOT NULL
+     AND (
+       g.materiales_agrupados IS NULL
+       OR NOT b.ZZSUSTITUTO IN UNNEST(g.materiales_agrupados)
+     )) AS switch_fuera_de_grupo
+
+  FROM base b
+  LEFT JOIN grupos g
+    USING (BISMT)
+)
+
+SELECT
+  *
+FROM marcados;
 """, file_name);
 
 END IF;

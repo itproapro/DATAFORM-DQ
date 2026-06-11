@@ -16,7 +16,9 @@ SET v_query = '''
    SELECT -- identificar registros donde MBRSH <> A
   COUNT(*)
 FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
-WHERE MBRSH <> 'A'
+WHERE MTART IN ('ZMER','ZFRE', 'ZSEC')
+  AND
+  (MBRSH <> 'A' OR MBRSH IS NULL)
 GROUP BY MATNR;
 ''';
 
