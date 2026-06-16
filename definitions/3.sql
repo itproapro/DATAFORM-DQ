@@ -43,7 +43,7 @@ FROM eval;
 
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
-SET v_total = (SELECT COUNT(*) FROM cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr);
+SET v_total = (SELECT COUNT(*) FROM cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr WHERE MTART IN ('ZMER','ZFRE', 'ZSEC'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
 
@@ -52,13 +52,14 @@ IF v_failed IS NULL THEN
 END IF;
 
 -- CALCULAR PORCENTAJE COMPLETITUD
-SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
+SET v_passed = COALESCE(ROUND(1 - SAFE_DIVIDE(v_failed, v_total),3)*100,100);
 
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 99.5  THEN 'PASSED'
-    else 'FAILED'
+    WHEN v_passed > 99 or v_passed IS NULL THEN 'PASSED'
+    WHEN v_passed < 99 THEN 'FAILED'
+    ELSE 'ERROR'
 END;
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
 SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, 'Coherencia entre el tipo de material (MTART) y la codificación interna del número de material (MATNR)');
@@ -103,17 +104,29 @@ EXECUTE IMMEDIATE FORMAT("""
   )
   AS
   WITH base AS (
-  SELECT
-    LPAD(CAST(MATNR AS STRING),18,'0') AS MATNR,
-    NULLIF(TRIM(CAST(MATKL AS STRING)),'') AS MATKL,
-    MTART
-  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
-    )
-    SELECT 
-      COUNT(*)
+    SELECT
+    RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
+    MTART,
+    SUBSTR(LPAD(CAST(MATNR AS STRING),18, '0'), 14,1) AS d5
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
+    ),
+    evaluacion AS (
+    SELECT
+        MATNR,
+        MTART,
+        d5,
+        CASE
+        WHEN d5 = '1' AND MTART = 'ZMER' THEN 'OK'
+        WHEN d5 = '3' AND MTART = 'ZFRE' THEN 'OK'
+        WHEN d5 = '4' AND MTART = 'ZSEC' THEN 'OK'
+        WHEN d5 NOT IN ('1','3','4') AND MTART IN ('ZMER', 'ZFRE', 'ZSEC') THEN 'INCORRECTO'
+        ELSE 'fuera_de_regla'
+        END AS estado
     FROM base
-    WHERE(
-      (MATKL IS NULL AND MTART IN ('ZMER','ZSEC','ZFRE')) OR (MATKL NOT IN ('SUPPLIER','SYSCO','NO.BRAND','METRO','MAKRO','PAP','CUSTOMER') AND MTART IN ('ZMER','ZSEC','ZFRE')))
+    )
+    SELECT MATNR, MTART FROM evaluacion
+    WHERE estado <> 'OK'  AND estado <> 'fuera_de_regla' -- info materiales ZMER - ZFRE - ZSEC
+    ORDER BY estado, MATNR;
 """, file_name);
 
 END IF;

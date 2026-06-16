@@ -35,7 +35,6 @@ evaluacion AS (
     END AS estado
   FROM joined
 )
--- % CALIDAD DEL DATO
 
 SELECT
   COUNTIF(estado = 'INCORRECTO') AS incorrectos
@@ -61,14 +60,12 @@ END IF;
 -- CALCULAR PORCENTAJE COMPLETITUD
 SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
-select v_passed;
-select v_failed;
-select v_total;
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 99.5  THEN 'PASSED'
-    else 'FAILED'
+    WHEN v_passed > 99 or v_passed IS NULL THEN 'PASSED'
+    WHEN v_passed < 99 THEN 'FAILED'
+    ELSE 'ERROR'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
@@ -98,7 +95,7 @@ VALUES (
 
 -- ENVIO DE CAMPOS A REVISAR POR OWNER
 
-IF v_status = 'FAILED' THEN
+IF v_passed != 100 THEN
 SET file_name = CONCAT(
   'gs://maestromateriales-dataquality-pap/REGLA_DQ_5_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),

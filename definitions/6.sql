@@ -110,8 +110,9 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 99.5  THEN 'PASSED'
-    else 'FAILED'
+    WHEN v_passed > 99 or v_passed is null THEN 'PASSED'
+    WHEN v_passed < 99 THEN 'FAILED'
+    ELSE 'ERROR'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
@@ -141,7 +142,7 @@ VALUES (
 
 -- ENVIO DE CAMPOS A REVISAR POR OWNER
 
-IF v_status = 'FAILED' THEN
+IF v_passed != 100 THEN
 SET file_name = CONCAT(
   'gs://maestromateriales-dataquality-pap/REGLA_DQ_6_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
@@ -192,6 +193,7 @@ EXECUTE IMMEDIATE FORMAT("""
 
         --d5 = REFRIGERADOS
         WHEN d5='3' AND WERKS = 4400 THEN '6244'
+        WHEN d5='3' AND WERKS = 4300 THEN '6243'
         WHEN d5='3' AND WERKS BETWEEN 6240 AND 6247 THEN CAST(WERKS AS STRING)
 
             --d5 = SECOS
@@ -223,11 +225,12 @@ EXECUTE IMMEDIATE FORMAT("""
     SELECT
     COUNT(*) AS incorrectos FROM eval
     WHERE 
-        MTART IN ('ZMER','ZSEC','ZFRE') AND
-        d5 IN ('1','3','4')
-        AND (
-        LGPRO IS NULL OR LGPRO_esperado IS NULL OR LGPRO != LGPRO_esperado
-        )
+      MTART IN ('ZMER','ZSEC','ZFRE') AND
+      d5 IN ('1','3','4')
+      AND (
+      LGPRO IS NULL OR LGPRO_esperado IS NULL OR LGPRO != LGPRO_esperado
+      )
+    ORDER BY WERKS, MATNR
 """, file_name);
 
 

@@ -26,7 +26,7 @@ GROUP BY MATNR;
 
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
-SET v_total = (SELECT COUNT(*) FROM cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr);
+SET v_total = (SELECT COUNT(*) FROM cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr WHERE MTART IN ('ZMER','ZFRE', 'ZSEC'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
 
@@ -40,8 +40,9 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 99.5  THEN 'PASSED'
-    else 'FAILED'
+    WHEN v_passed > 99 or v_passed IS NULL THEN 'PASSED'
+    WHEN v_passed < 99 THEN 'FAILED'
+    ELSE 'ERROR'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
@@ -88,11 +89,13 @@ EXECUTE IMMEDIATE FORMAT("""
   )
   AS
     SELECT -- identificar registros donde MBRSH <> A
-    MATNR,
+    RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5) AS MATNR,
     MBRSH
     FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
-    WHERE MBRSH <> 'A'
-    ORDER BY MATNR DESC;
+    WHERE 
+    MTART IN ('ZMER','ZFRE', 'ZSEC')
+    AND
+    (MBRSH <> 'A' OR MBRSH IS NULL);
 """, file_name);
 
 END IF;

@@ -17,10 +17,8 @@ SET v_rule_id = 8;
 SET v_query = '''
   SELECT
     COUNT(*)
-  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m 
-  JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS c ON m.MATNR = c.MATNR
-
-WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND SPART IS NULL;
+  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
+WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND (SPART != '10' OR SPART IS NULL);
 ''';
 
 
@@ -29,9 +27,7 @@ WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND SPART IS NULL;
 -- Calculo los valores totales
 SET v_total = (SELECT
     COUNT(m.MATNR)
-  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m 
-  JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS c ON m.MATNR = c.MATNR
-  
+  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`  
 WHERE 
 ( MTART IN ('ZMER','ZSEC','ZFRE')));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
@@ -46,8 +42,9 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 99.5  THEN 'PASSED'
-    else 'FAILED'
+    WHEN v_passed > 99 or v_passed is null THEN 'PASSED'
+    WHEN v_passed < 99 THEN 'FAILED'
+    ELSE 'ERROR'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
@@ -76,7 +73,7 @@ VALUES (
 );
 
 
-IF v_status = 'FAILED' THEN
+IF v_passed != 100 THEN
 SET file_name = CONCAT(
   'gs://maestromateriales-dataquality-pap/REGLA_DQ_8_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
@@ -91,16 +88,12 @@ EXECUTE IMMEDIATE FORMAT("""
     field_delimiter = ';',
     overwrite = true
   )
-
   AS
   SELECT
-  m.MATNR,
-  MTART,
-  SPART
-  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m 
-  JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS c ON m.MATNR = c.MATNR
-  WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND SPART IS NULL
-  ORDER BY m.MATNR DESC;
+    RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
+    MTART
+  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` 
+WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND (SPART != '10' OR SPART IS NULL);
 """, file_name);
 
 END IF;

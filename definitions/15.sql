@@ -124,7 +124,7 @@ VALUES (
     v_details
 );
 
-IF v_status = 'FAILED' THEN
+IF v_passed != 100 THEN
 SET file_name = CONCAT(
   'gs://maestromateriales-dataquality-pap/REGLA_DQ_15_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
@@ -145,7 +145,7 @@ EXECUTE IMMEDIATE FORMAT("""
     RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
     BISMT,
     RIGHT(LPAD(CAST(ZZSUSTITUTO AS STRING),18,'0'),5) AS ZZSUSTITUTO,
-  FROM `cf-esproapro-bic-dev-y5.SH_STG_PROD.bqt_material_attr`
+  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
   WHERE MTART IN ('ZMER','ZSEC','ZFRE')
 ),
 

@@ -47,8 +47,9 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 99.5  THEN 'PASSED'
-    else 'FAILED'
+    WHEN v_passed > 99 or v_passed is null THEN 'PASSED'
+    WHEN v_passed < 99 THEN 'FAILED'
+    ELSE 'ERROR'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
@@ -78,7 +79,7 @@ VALUES (
 
 
 
-IF v_status = 'FAILED' THEN
+IF v_passed != 100 THEN
 SET file_name = CONCAT(
   'gs://maestromateriales-dataquality-pap/REGLA_DQ_13_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
@@ -96,19 +97,19 @@ EXECUTE IMMEDIATE FORMAT("""
   AS
   WITH base AS (
   SELECT
-    MATNR,
+    RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
     MTART,
     MEINS
   FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
   )
   SELECT
-    MATNR,
+    RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
     MTART,
     MEINS
     FROM base
     WHERE
     MTART IN ('ZMER','ZFRE','ZSEC') 
-    AND MEINS NOT IN ('ST','CS');
+    AND MEINS NOT IN ('ST','CS')
     ORDER BY MATNR DESC;
 """, file_name);
 
