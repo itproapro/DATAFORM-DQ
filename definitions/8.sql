@@ -26,7 +26,7 @@ WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND (SPART != '10' OR SPART IS NULL);
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
 SET v_total = (SELECT
-    COUNT(m.MATNR)
+    COUNT(MATNR)
   FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`  
 WHERE 
 ( MTART IN ('ZMER','ZSEC','ZFRE')));
