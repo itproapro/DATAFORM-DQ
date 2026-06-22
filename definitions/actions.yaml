@@ -178,6 +178,12 @@ actions:
     - name: Trigger
     filename: 31.sql
 - operation:
+    name: 32
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: Trigger
+    filename: 32.sql
+- operation:
     name: barrier
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
