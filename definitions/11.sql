@@ -1,4 +1,4 @@
---query_descripcion_es_TXTMD
+--query_descripcion_en_TXTMD
 
 -- DECLARO VARIABLES
 DECLARE v_rule_id INT64 ;  -- ID de la regla
@@ -12,9 +12,9 @@ DECLARE file_name STRING; --Nombre del archivo al bucket
 DECLARE v_regex STRING; --Variable regex
 
 -- DEFINIR ID RULE
-SET v_rule_id = 9;
+SET v_rule_id = 11;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: Descripción ES -> debe tener un máximo de 40 caracteres y no debe contener caracteres especiales ('"¡!#*\\).
+-- DEFINIR LA REGLA ASIGNADA A v_query: Descripción EN -> debe tener un máximo de 40 caracteres y no debe contener caracteres especiales ('"¡!#*\\).
 SET v_regex = r'''['"¡!#*\\]''';
 
 SET v_query = '''
@@ -23,7 +23,7 @@ SET v_query = '''
     FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_text` AS D
     JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS M ON D.MATNR = M.MATNR
     WHERE MTART IN ('ZMER', 'ZSEC', 'ZFRE') 
-    AND SPRAS = 'S' 
+    AND SPRAS = 'E' 
     AND REGEXP_CONTAINS(TXTMD, @regex)
     AND TXTMD IS NULL OR LENGTH(TXTMD) > 40;
 ''';
@@ -55,7 +55,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validación campo Descripción ES');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validación campo Descripción EN');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -82,7 +82,7 @@ VALUES (
 
 IF v_passed != 100 THEN
 SET file_name = CONCAT(
-  'gs://maestromateriales-dataquality-pap/REGLA_DQ_9_MARA_',
+  'gs://maestromateriales-dataquality-pap/REGLA_DQ_11_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
   '_*.csv'
 );
@@ -102,7 +102,7 @@ EXECUTE IMMEDIATE FORMAT("""
   JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS M 
   ON D.MATNR = M.MATNR
   WHERE MTART IN ('ZMER', 'ZSEC', 'ZFRE') 
-  AND SPRAS = 'S' 
+  AND SPRAS = 'E' 
   AND REGEXP_CONTAINS(TXTMD, @regex)
     AND TXTMD IS NULL OR LENGTH(TXTMD) > 40;
 """, file_name);
