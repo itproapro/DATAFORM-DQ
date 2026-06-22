@@ -1,4 +1,4 @@
---query_temperatura_ZZTEMPERATURA
+--query_movimiento_ZZMOVIMIENTO
 
 -- DECLARO VARIABLES
 DECLARE v_rule_id INT64 ;  -- ID de la regla
@@ -12,33 +12,17 @@ DECLARE file_name STRING; --Nombre del archivo al bucket
 
 
 -- DEFINIR ID RULE
-SET v_rule_id = 20;
+SET v_rule_id = 21;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: Indicador de temperatura: si es ZMER --> CONGELADO; si es ZFRE --> REFRIGERAD; si es ZSEC --> SECO
+-- DEFINIR LA REGLA ASIGNADA A v_query: Indicador de movimiento: [ALTA - ALTA-SUSTITUCIÓN - ALTA-ALTERNATIVA]
 
 
 SET v_query = '''
-    WITH base AS (
     SELECT
-        RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
-        MTART,
-        ZZTEMPERATURA,
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
-    ), 
-    evaluacion AS (
-    SELECT 
-    *,
-    CASE
-        WHEN (ZZTEMPERATURA IS NULL) OR (ZZTEMPERATURA NOT IN ('CONGELADO','SECO','REFRIGERAD')) THEN 'INCORRECTO'
-        WHEN ZZTEMPERATURA = 'CONGELADO' AND MTART != 'ZMER' THEN 'INCORRECTO'
-        WHEN ZZTEMPERATURA = 'SECO' AND MTART != 'ZSEC' THEN 'INCORRECTO'
-        WHEN ZZTEMPERATURA = 'REFRIGERAD' AND MTART != 'ZFRE' THEN 'INCORRECTO'
-        ELSE 'CORRECTO'
-    END AS condicion
-    FROM base
-    )
-    SELECT COUNT(*) FROM evaluacion
-    WHERE MTART IN ('ZMER','ZFRE','ZSEC') AND condicion = 'INCORRECTO';
+    COUNT(*)
+  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
+
+WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND (ZZMOVIMIENTO IS NULL OR ZZMOVIMIENTO NOT IN ('ALTA','ALTA-SUSTITUCIÓN','ALTA-ALTERNATIVA'));
 ''';
 
 
@@ -62,13 +46,13 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 99 or v_passed is null THEN 'PASSED'
-    WHEN v_passed < 99 THEN 'FAILED'
+    WHEN v_passed > 90 or v_passed is null THEN 'PASSED'
+    WHEN v_passed < 90 THEN 'FAILED'
     ELSE 'ERROR'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validación indicador de temperatura');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validación indicador de movimiento');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -95,7 +79,7 @@ VALUES (
 
 IF v_passed != 100 THEN
 SET file_name = CONCAT(
-  'gs://maestromateriales-dataquality-pap/REGLA_DQ_20_MARA_',
+  'gs://maestromateriales-dataquality-pap/REGLA_DQ_21_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
   '_*.csv'
 );
@@ -109,28 +93,13 @@ EXECUTE IMMEDIATE FORMAT("""
     overwrite = true
   )
   AS
-    WITH base AS (
-  SELECT
-    RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
-    MTART,
-    ZZTEMPERATURA,
-  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
-), 
-evaluacion AS (
-SELECT 
-  *,
-  CASE
-    WHEN (ZZTEMPERATURA IS NULL) OR (ZZTEMPERATURA NOT IN ('CONGELADO','SECO','REFRIGERAD')) THEN 'INCORRECTO'
-    WHEN ZZTEMPERATURA = 'CONGELADO' AND MTART != 'ZMER' THEN 'INCORRECTO'
-    WHEN ZZTEMPERATURA = 'SECO' AND MTART != 'ZSEC' THEN 'INCORRECTO'
-    WHEN ZZTEMPERATURA = 'REFRIGERAD' AND MTART != 'ZFRE' THEN 'INCORRECTO'
-    ELSE 'CORRECTO'
-  END AS condicion
-FROM base
-)
-SELECT * FROM evaluacion
-WHERE MTART IN ('ZMER','ZFRE','ZSEC') AND condicion = 'INCORRECTO'
-ORDER BY MATNR;
+    SELECT
+        RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
+        ZZMOVIMIENTO
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
+
+    WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND (ZZMOVIMIENTO IS NULL OR ZZMOVIMIENTO NOT IN ('ALTA','ALTA-SUSTITUCIÓN','ALTA-ALTERNATIVA'))
+    GROUP BY MATNR, ZZMOVIMIENTO ORDER BY MATNR ASC;
 """, file_name);
 
 END IF;

@@ -112,6 +112,12 @@ actions:
     - name: Trigger
     filename: 20.sql
 - operation:
+    name: 21
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: Trigger
+    filename: 21.sql
+- operation:
     name: 22
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
