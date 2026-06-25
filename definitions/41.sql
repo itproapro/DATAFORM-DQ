@@ -1,4 +1,4 @@
---query_verif.disponibilidad_MTVFP
+--query_grupo_de_transporte_TRAGR
 
 -- DECLARO VARIABLES
 DECLARE v_rule_id INT64 ;  -- ID de la regla
@@ -11,16 +11,14 @@ DECLARE v_details STRING; --Detalles de la ejecución
 DECLARE file_name STRING; --Nombre del archivo al bucket
 
 -- DEFINIR ID RULE
-SET v_rule_id = 40;
+SET v_rule_id = 41;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: VERIF. DISPONIBILIDAD --> de momento verificamos que el valor de este campo sea igual a la constante 'Z2' para los materiales tipo 'ZMER'-'ZFRE'-'ZSEC'.
+-- DEFINIR LA REGLA ASIGNADA A v_query: GRUPO DE TRANSPORTE --> verificamos que este campo no sea igual a '0001' o no sea nulo.
 SET v_query = '''
     SELECT
-        COUNT(DISTINCT(m.MATNR))
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m 
-    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS c
-    ON m.MATNR = c.MATNR
-    WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND (MTVFP != 'Z2' OR MTVFP IS NULL);
+    COUNT(DISTINCT(MATNR))
+FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
+WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND (TRAGR != '0001' OR TRAGR IS NULL)
 ''';
 
 
@@ -29,10 +27,8 @@ SET v_query = '''
 -- Calculo los valores totales
 SET v_total = (SELECT
   COUNT(*)
-  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m 
-  JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS c
-  ON m.MATNR = c.MATNR
-WHERE m.MTART IN ('ZMER','ZSEC','ZFRE'));
+  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` 
+WHERE MTART IN ('ZMER','ZSEC','ZFRE'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
 
@@ -54,7 +50,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validación de la verificación de la disponibilidad del material.');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validación del grupo de transporte.');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -82,7 +78,7 @@ VALUES (
 
 IF v_passed != 100 THEN
 SET file_name = CONCAT(
-  'gs://maestromateriales-dataquality-pap/REGLA_DQ_40_MARA_',
+  'gs://maestromateriales-dataquality-pap/REGLA_DQ_41_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
   '_*.csv'
 );
@@ -97,13 +93,10 @@ EXECUTE IMMEDIATE FORMAT("""
   )
   AS
     SELECT
-        RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5) AS MATNR,
-        WERKS,
-        MTVFP
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m 
-    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS c
-    ON m.MATNR = c.MATNR
-    WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND (MTVFP != 'Z2' OR MTVFP IS NULL);
+        RIGHT(LPAD(CAST(MATNR AS STRING),18,'0'),5) AS MATNR,
+        TRAGR,
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
+    WHERE MTART IN ('ZMER','ZSEC','ZFRE') AND TRAGR IS NULL;
 """, file_name);
 
 END IF;
