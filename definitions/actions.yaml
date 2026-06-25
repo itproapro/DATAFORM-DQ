@@ -238,6 +238,12 @@ actions:
     - name: 40
     filename: 41.sql
 - operation:
+    name: 42
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: 41
+    filename: 42.sql
+- operation:
     name: barrier
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
@@ -278,6 +284,7 @@ actions:
       - name: 39
       - name: 40
       - name: 41
+      - name: 42
     filename: barrier.sql
 - operation:
     name: cube
