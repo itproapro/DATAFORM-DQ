@@ -13,7 +13,7 @@ DECLARE file_name STRING; --Nombre del archivo al bucket
 -- DEFINIR ID RULE
 SET v_rule_id = 58;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: APROVISIONAMIENTO ESPECIAL--> verificamos que tenga el mismo valor que su almacén.
+-- DEFINIR LA REGLA ASIGNADA A v_query: ALMACEN APROV. EXTERNO--> verificamos que tenga el mismo valor que su almacén.
 
 SET v_query = '''
           WITH base AS (
