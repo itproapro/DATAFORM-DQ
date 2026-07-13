@@ -328,6 +328,12 @@ actions:
     - name: 56
     filename: 57.sql
 - operation:
+    name: 58
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: 57
+    filename: 58.sql
+- operation:
     name: barrier
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
