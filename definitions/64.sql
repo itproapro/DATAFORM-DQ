@@ -1,4 +1,4 @@
---query_plazo_entrega_PLIFZ
+--query_margen_de_seguridad_SHZET
 
 -- DECLARO VARIABLES
 DECLARE v_rule_id INT64 ;  -- ID de la regla
@@ -11,22 +11,17 @@ DECLARE v_details STRING; --Detalles de la ejecución
 DECLARE file_name STRING; --Nombre del archivo al bucket
 
 -- DEFINIR ID RULE
-SET v_rule_id = 61;
+SET v_rule_id = 64;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: PLAZO DE ENTREGA: por el momento verificamos que no haya plazo de entrega nulo.
+-- DEFINIR LA REGLA ASIGNADA A v_query: MARGEN DE SEGURIDAD --> verificamos que el campo tenga un valor igual a '13','14','12' definidos por negocio.
 
 SET v_query = '''
-        SELECT
-            COUNT(*)
-        FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
-        JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS c 
-        ON m.MATNR = c.MATNR
-        WHERE 
-        m.MTART IN ('ZMER','ZSEC','ZFRE')
-        AND 
-        (WERKS IN ('6440','6441','6442','4300','4400','6340','6341','6342','6242'))
-        AND
-        PLIFZ IS NULL;
+    SELECT
+        COUNT(*)
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
+    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS c 
+    ON m.MATNR = c.MATNR
+    WHERE m.MTART IN ('ZMER','ZSEC','ZFRE') AND SHZET NOT IN ('12','13','14')  AND (WERKS IN ('6440','6441','4300','6442','4400','6340','6341','6342','6242'));
 ''';
 
 
@@ -54,13 +49,13 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 99 or v_passed is null THEN 'PASSED'
-    WHEN v_passed < 99 THEN 'FAILED'
+    WHEN v_passed > 90 or v_passed is null THEN 'PASSED'
+    WHEN v_passed < 90 THEN 'FAILED'
     ELSE 'ERROR'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos número de días para obtener el material.');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos la configuración de la cantidad de días laborables para el margen de seguridad/cobertura real.');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -88,7 +83,7 @@ VALUES (
 
 IF v_passed != 100 THEN
 SET file_name = CONCAT(
-  'gs://maestromateriales-dataquality-pap/REGLA_DQ_61_MARA_',
+  'gs://maestromateriales-dataquality-pap/REGLA_DQ_64_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
   '_*.csv'
 );
@@ -101,22 +96,17 @@ EXECUTE IMMEDIATE FORMAT("""
     field_delimiter = ';',
     overwrite = true
   )
-  AS 
+  AS  
     SELECT
         RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5) AS MATNR,
         MMSTA,
         MTART,
         WERKS,
-        PLIFZ,
+        SHFLG
     FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
     JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS c 
     ON m.MATNR = c.MATNR
-     WHERE 
-     m.MTART IN ('ZMER','ZSEC','ZFRE')
-     AND 
-     WERKS IN ('6440','6441','6442','4300','4400','6340','6341','6342','6242')
-     AND
-     PLIFZ IS NULL;  
+    WHERE m.MTART IN ('ZMER','ZSEC','ZFRE') AND SHZET NOT IN ('12','13','14')  AND (WERKS IN ('6440','6441','4300','6442','4400','6340','6341','6342','6242'));  
 """, file_name);
 
 END IF;
