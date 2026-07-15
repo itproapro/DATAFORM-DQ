@@ -1,4 +1,4 @@
---query_can_uma2_UMREN
+--query_uma2_MEINH
 
 -- DECLARO VARIABLES
 DECLARE v_rule_id INT64 ;  -- ID de la regla
@@ -11,9 +11,9 @@ DECLARE v_details STRING; --Detalles de la ejecución
 DECLARE file_name STRING; --Nombre del archivo al bucket
 
 -- DEFINIR ID RULE
-SET v_rule_id = 69;
+SET v_rule_id = 70;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: CAN_UMA_2 --> Cantidad Unidad de medida alternativa 2.
+-- DEFINIR LA REGLA ASIGNADA A v_query: UMA_2 --> Unidad de medida alternativa 2.
 
 SET v_query = '''
         SELECT
@@ -22,11 +22,11 @@ SET v_query = '''
         JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_ztbw_marm` AS mr
         ON m.MATNR = mr.MATNR
         WHERE
-        MTART IN ('ZMER','ZFRE', 'ZSEC')
+        (MTART IN ('ZMER','ZFRE', 'ZSEC'))
         AND
-        (MEINS = 'ST' AND mr.MEINH = 'ST' AND (UMREN IS NULL OR UMREN != 1))
+        (MEINS = 'ST' AND mr.MEINH = 'CS' AND (UMREZ < UMREN))
         OR
-        (MEINS = 'CS' AND mr.MEINH = 'ST' AND (UMREN IS NULL OR UMREN < 1));
+        (MEINS = 'CS' AND mr.MEINH = 'CS' AND (UMREZ != UMREN AND UMREN != 1));
 ''';
 
 
@@ -35,8 +35,11 @@ SET v_query = '''
 -- Calculo los valores totales
 SET v_total = (SELECT
   COUNT(*)
-  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` 
-WHERE MTART IN ('ZMER','ZSEC','ZFRE'));
+  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
+    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_ztbw_marm` AS mr
+    ON m.MATNR = mr.MATNR 
+    WHERE MTART IN ('ZMER','ZSEC','ZFRE')
+    AND mr.MEINH IN ('CS','ST'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
 
@@ -58,7 +61,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validación en la relación entre UMB y su conversión para la UMA_2 (unidad de medida alternativa 2).');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validación de la UMA_2 (unidad de medida alternativa 2) según el valor de la UMB.');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -86,7 +89,7 @@ VALUES (
 
 IF v_passed != 100 THEN
 SET file_name = CONCAT(
-  'gs://maestromateriales-dataquality-pap/REGLA_DQ_69_MARA_',
+  'gs://maestromateriales-dataquality-pap/REGLA_DQ_70_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
   '_*.csv'
 );
@@ -109,11 +112,11 @@ EXECUTE IMMEDIATE FORMAT("""
     JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_ztbw_marm` AS mr
     ON m.MATNR = mr.MATNR
     WHERE
-    MTART IN ('ZMER','ZFRE', 'ZSEC')
+    (MTART IN ('ZMER','ZFRE', 'ZSEC'))
     AND
-    (MEINS = 'ST' AND mr.MEINH = 'ST' AND (UMREN IS NULL OR UMREN != 1))
+    (MEINS = 'ST' AND mr.MEINH = 'CS' AND (UMREZ < UMREN))
     OR
-    (MEINS = 'CS' AND mr.MEINH = 'ST' AND (UMREN IS NULL OR UMREN < 1));
+    (MEINS = 'CS' AND mr.MEINH = 'CS' AND (UMREZ != UMREN AND UMREN != 1));
 """, file_name);
 
 END IF;
