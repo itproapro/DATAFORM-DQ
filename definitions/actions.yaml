@@ -388,6 +388,12 @@ actions:
     - name: 67
     filename: 68.sql
 - operation:
+    name: 69
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: 68
+    filename: 69.sql
+- operation:
     name: barrier
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
@@ -453,6 +459,7 @@ actions:
       - name: 66
       - name: 67
       - name: 68
+      - name: 69
     filename: barrier.sql
 - operation:
     name: cube
