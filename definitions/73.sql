@@ -14,9 +14,22 @@ DECLARE file_name STRING; --Nombre del archivo al bucket
 SET v_rule_id = 73;
 
 -- DEFINIR LA REGLA ASIGNADA A v_query: TIPO_EAN_UN_2 ->Tipo código ean11 un2.
+--Debemos revisar la definición y validación de esta regla; tenemos +1800 registros con tipo de ean IE.
 
 SET v_query = '''
-        
+    SELECT
+        COUNT(*)
+        FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
+        JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_ztbw_marm` AS mr
+        ON m.MATNR = mr.MATNR
+        WHERE
+            (MTART IN ('ZMER','ZFRE', 'ZSEC'))
+            AND
+            mr.EAN11 IS NOT NULL AND mr.EAN11 !=''
+            AND ((LENGTH(CAST(mr.EAN11 AS STRING)) = 14 AND mr.NUMTP != 'IC' AND mr.MEINH != 'CS')
+            OR (LENGTH(CAST(mr.EAN11 AS STRING)) = 13 AND mr.NUMTP != 'HE' AND mr.MEINH != 'ST')
+            OR ( LENGTH(mr.EAN11) NOT IN (13,14) AND mr.MEINH IN ('CS', 'ST'))
+    );
 ''';
 
 
