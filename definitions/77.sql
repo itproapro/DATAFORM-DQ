@@ -13,7 +13,7 @@ DECLARE file_name STRING; --Nombre del archivo al bucket
 -- DEFINIR ID RULE
 SET v_rule_id = 77;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: -- 
+-- DEFINIR LA REGLA ASIGNADA A v_query: -- Unidad de volumen 2-> verificamos la unidad de volumen 2 sea igual a: de momento tomamos como válido M3.
 
 SET v_query = '''
     SELECT
