@@ -105,8 +105,8 @@ EXECUTE IMMEDIATE FORMAT("""
         RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5) AS MATNR,
         mr.MEINH,
         mr.VOLUM
-    FROM `cf-esproapro-bic-dev-y5.SH_STG_PROD.bqt_material_attr` AS m
-    JOIN `cf-esproapro-bic-dev-y5.SH_STG_PROD.bqt_ztbw_marm` AS mr
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
+    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_ztbw_marm` AS mr
     ON m.MATNR = mr.MATNR
         WHERE
             m.MTART IN ('ZMER','ZFRE','ZSEC')
