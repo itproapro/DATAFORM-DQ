@@ -1,4 +1,4 @@
---query_unidad_de_dimension2_MEABM
+--query_can_uma3_UMREN
 
 -- DECLARO VARIABLES
 DECLARE v_rule_id INT64 ;  -- ID de la regla
@@ -11,9 +11,9 @@ DECLARE v_details STRING; --Detalles de la ejecución
 DECLARE file_name STRING; --Nombre del archivo al bucket
 
 -- DEFINIR ID RULE
-SET v_rule_id = 81;
+SET v_rule_id = 82;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: -- Unidad de dimensión 2-> comprobamos que el valor sea igual a MM si UMB es distinta de CJ.
+-- DEFINIR LA REGLA ASIGNADA A v_query: -- Can uma3-> comprobamos la relación de kilos vs kg netos de la umb.
 
 SET v_query = '''
     SELECT
@@ -24,7 +24,7 @@ SET v_query = '''
     WHERE
         m.MTART IN ('ZMER','ZFRE','ZSEC')
         AND
-        mr.MEINH = 'CS' AND (mr.MEABM IS NULL OR mr.MEABM != 'MM');
+        mr.MEINH = 'KG' AND mr.UMREN /mr.UMREZ  != m.NTGEW;
 ''';
 
 
@@ -59,7 +59,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos el valor de la unidad de la umb2.');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos el valor de los kilogramos de la unidad alternativa 3 (KG).');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -87,7 +87,7 @@ VALUES (
 
 IF v_passed != 100 THEN
 SET file_name = CONCAT(
-  'gs://maestromateriales-dataquality-pap/REGLA_DQ_81_MARA_',
+  'gs://maestromateriales-dataquality-pap/REGLA_DQ_82_MARA_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
   '_*.csv'
 );
@@ -104,14 +104,18 @@ EXECUTE IMMEDIATE FORMAT("""
     SELECT
         RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5) AS MATNR,
         mr.MEINH,
-        mr.MEABM
+        mr.UMREN,
+        mr.UMREZ,
+        m.BRGEW,
+        m.NTGEW,
+        mr.UMREN /mr.UMREZ
     FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
     JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_ztbw_marm` AS mr
     ON m.MATNR = mr.MATNR
         WHERE
-          m.MTART IN ('ZMER','ZFRE','ZSEC')
-          AND
-          mr.MEINH = 'CS' AND (mr.MEABM IS NULL OR mr.MEABM != 'MM');
+            m.MTART IN ('ZMER','ZFRE','ZSEC')
+            AND
+            mr.MEINH = 'KG' AND mr.UMREN /mr.UMREZ  != m.NTGEW;
      
 """, file_name);
 
