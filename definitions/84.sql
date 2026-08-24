@@ -13,7 +13,7 @@ DECLARE file_name STRING; --Nombre del archivo al bucket
 -- DEFINIR ID RULE
 SET v_rule_id = 84;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: -- Cantidad Unidad de medida base 4 --> el valor de este campo (umb4) será múltiplo del campo cantidad de unidad de medida alternativa 4 (uma4).
+-- DEFINIR LA REGLA ASIGNADA A v_query: -- Cantidad Unidad de medida base 4 --> el valor de este campo (can_umb4) será múltiplo del campo cantidad de unidad de medida base 5 (umb5).
 
 SET v_query = '''
     WITH MARM AS (
@@ -27,13 +27,14 @@ SET v_query = '''
           WHERE
             m.MTART IN ('ZMER','ZFRE','ZSEC')
             AND
-            mr.MEINH IN ('PAL', 'CAP')
+            mr.MEINH IN ('PAL', 'CAP','CS')
         ),
         pivot AS (
           SELECT
             MATNR,
             MAX(CASE WHEN MEINH_MARM = 'PAL' THEN UMREZ END) AS umrez_pal,
-            MAX(CASE WHEN MEINH_MARM = 'CAP' THEN UMREZ END) AS umrez_cap
+            MAX(CASE WHEN MEINH_MARM = 'CAP' THEN UMREZ END) AS umrez_cap,
+            MAX(CASE WHEN MEINH_MARM = 'CS' THEN UMREZ END) AS umrez_cj
           FROM MARM 
           GROUP BY MATNR 
         )
@@ -41,11 +42,19 @@ SET v_query = '''
           COUNT(*)
         FROM pivot 
           WHERE
+            --PAL debe ser múltiplo de CAP.
+            (
             umrez_pal IS NOT NULL
-            AND
-            umrez_cap IS NOT NULL
-            AND (
-              umrez_cap = 0 OR MOD(umrez_pal,umrez_cap)!= 0);
+            AND umrez_pal IS NOT NULL
+            AND MOD(umrez_pal, umrez_cap) != 0
+            )
+            OR
+            --PAL debe ser múltiplo de CS.
+            (
+            umrez_pal IS NOT NULL
+            AND umrez_cj IS NOT NULL
+            AND MOD(umrez_pal,umrez_cj)!= 0
+            );
 ''';
 
 
@@ -58,7 +67,7 @@ SET v_total = (SELECT
     JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_ztbw_marm` AS mr
     ON m.MATNR = mr.MATNR 
     WHERE MTART IN ('ZMER','ZSEC','ZFRE')
-    AND mr.MEINH IN ('PAL', 'CAP'));
+    AND mr.MEINH = 'PAL');
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
 
@@ -80,7 +89,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos el valor de la unidad de medida base 4 (CAP) en relación con la uma4(PAL).');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos el valor de la unidad de medida base 4 (PAL) en relación con la umb5(CAP) y en realción a can_umb2 (CJ) o si umb=UN será en relación a can_uma2(UN).');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -133,25 +142,36 @@ EXECUTE IMMEDIATE FORMAT("""
           WHERE
             m.MTART IN ('ZMER','ZFRE','ZSEC')
             AND
-            mr.MEINH IN ('PAL', 'CAP')
+            mr.MEINH IN ('PAL', 'CAP', 'CS')
         ),
         pivot AS (
           SELECT
             MATNR,
             MAX(CASE WHEN MEINH_MARM = 'PAL' THEN UMREZ END) AS umrez_pal,
-            MAX(CASE WHEN MEINH_MARM = 'CAP' THEN UMREZ END) AS umrez_cap
+            MAX(CASE WHEN MEINH_MARM = 'CAP' THEN UMREZ END) AS umrez_cap,
+            MAX(CASE WHEN MEINH_MARM = 'CS' THEN UMREZ END) AS umrez_cj
           FROM MARM 
           GROUP BY MATNR 
         )
         SELECT
-          COUNT(*)
+          MATNR,
+          umrez_pal,
+          umrez_cap,
+          umrez_cj
         FROM pivot 
           WHERE
+            --PAL debe ser múltiplo de CAP.
+            (
             umrez_pal IS NOT NULL
-            AND
-            umrez_cap IS NOT NULL
-            AND (
-              umrez_cap = 0 OR MOD(umrez_pal,umrez_cap)!= 0);
+            AND umrez_pal IS NOT NULL
+            AND MOD(umrez_pal, umrez_cap) != 0
+            )
+            OR
+            --PAL debe ser múltiplo de CS.
+            (
+            umrez_pal IS NOT NULL
+            AND umrez_cj IS NOT NULL
+            AND MOD(umrez_pal,umrez_cj)!= 0);
      
 """, file_name);
 
