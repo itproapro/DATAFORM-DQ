@@ -13,20 +13,30 @@ DECLARE file_name STRING; --Nombre del archivo al bucket
 -- DEFINIR ID RULE
 SET v_rule_id = 89;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: -- Indicador que clasifica un material según su consumo, A, B y C, siendo A el de mayor consumo.
+-- DEFINIR LA REGLA ASIGNADA A v_query: -- Categoría valoración --> este campo debe respetar la siguiente relación: si es congelado --> PT01; si es seco --> PT04 y si es refrigerado -->PT03.
 
 SET v_query = '''
     SELECT
-        COUNT(*)
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS mc
+      COUNT(*)
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zvbw_zv_mbewh` AS mb
     JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
-    ON m.MATNR = mc.MATNR
-    WHERE
-        MTART IN ('ZMER','ZFRE', 'ZSEC')
-        AND
-        MAABC IS NULL  
-        OR
-        MAABC NOT IN ('A','B','C');
+    ON m.MATNR = mb.MATNR
+      WHERE MTART IN ('ZMER','ZFRE', 'ZSEC')
+      AND
+      (
+        SUBSTR(RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5),1,1) = '1'
+        AND BKLAS != 'PT01'
+      )
+      OR
+      (
+        SUBSTR(RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5),1,1) = '4'
+        AND BKLAS != 'PT04'
+      )
+      OR
+      (
+        SUBSTR(RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5),1,1) = '3'
+        AND BKLAS != 'PT03'
+      )
 ''';
 
 
@@ -35,9 +45,9 @@ SET v_query = '''
 -- Calculo los valores totales
 SET v_total = (SELECT
         COUNT(*)
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS mc
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zvbw_zv_mbewh` AS mb
     JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
-    ON m.MATNR = mc.MATNR 
+    ON m.MATNR = mb.MATNR
     WHERE MTART IN ('ZMER','ZSEC','ZFRE'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
@@ -54,13 +64,13 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 90 or v_passed is null THEN 'PASSED'
-    WHEN v_passed < 90 THEN 'FAILED'
+    WHEN v_passed > 99 or v_passed is null THEN 'PASSED'
+    WHEN v_passed < 99 THEN 'FAILED'
     ELSE 'ERROR'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos el valor del campo clasificación de materiales según su rotación de stock.');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos el valor de la categoría de valoración que tendrá impacto en cuentas de mayor tras una operación.');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -103,18 +113,28 @@ EXECUTE IMMEDIATE FORMAT("""
   )
   AS   
     SELECT
-        RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5) AS MATNR,
-        WERKS,
-        MAABC
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_plant_attr` AS mc
+      RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5) AS MATNR,
+      BKLAS,
+      SUBSTR(RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5),1,1) AS d1
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zvbw_zv_mbewh` AS mb
     JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
-    ON m.MATNR = mc.MATNR
-    WHERE
-        MTART IN ('ZMER','ZFRE', 'ZSEC')
-        AND
-        MAABC IS NULL  
-        OR
-        MAABC NOT IN ('A','B','C');
+    ON m.MATNR = mb.MATNR
+      WHERE MTART IN ('ZMER','ZFRE', 'ZSEC')
+      AND
+      (
+        SUBSTR(RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5),1,1) = '1'
+        AND BKLAS != 'PT01'
+      )
+      OR
+      (
+        SUBSTR(RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5),1,1) = '4'
+        AND BKLAS != 'PT04'
+      )
+      OR
+      (
+        SUBSTR(RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5),1,1) = '3'
+        AND BKLAS != 'PT03'
+      );
      
 """, file_name);
 
