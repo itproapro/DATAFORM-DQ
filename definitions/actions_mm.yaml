@@ -4,536 +4,536 @@ actions:
     project: cf-esproapro-bic-pro-ou
     filename: trigger.sql
 - operation:
-    name: 1
+    name: mm_rule_001
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
     - name: Trigger
     filename: MM/1.sql
 - operation:
-    name: 2
+    name: mm_rule_002
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 1
+    - name: mm_rule_001
     filename: MM/2.sql
 - operation:
-    name: 3
+    name: mm_rule_003
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 2
+    - name: mm_rule_002
     filename: MM/3.sql
 - operation:
-    name: 5
+    name: mm_rule_005
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 3
+    - name: mm_rule_003
     filename: MM/5.sql
 - operation:
-    name: 6
+    name: mm_rule_006
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 5
+    - name: mm_rule_005
     filename: MM/6.sql
 - operation:
-    name: 7
+    name: mm_rule_007
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 6
+    - name: mm_rule_006
     filename: MM/7.sql
 - operation:
-    name: 8
+    name: mm_rule_008
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 7
+    - name: mm_rule_007
     filename: MM/8.sql
 - operation:
-    name: 9
+    name: mm_rule_009
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 8
+    - name: mm_rule_008
     filename: MM/9.sql
 - operation:
-    name: 11
+    name: mm_rule_011
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 9
+    - name: mm_rule_009
     filename: MM/11.sql
 - operation:
-    name: 12
+    name: mm_rule_012
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 11
+    - name: mm_rule_011
     filename: MM/12.sql
 - operation:
-    name: 13
+    name: mm_rule_013
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 12
+    - name: mm_rule_012
     filename: MM/13.sql
 - operation:
-    name: 14
+    name: mm_rule_014
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 13
+    - name: mm_rule_013
     filename: MM/14.sql
 - operation:
-    name: 15
+    name: mm_rule_015
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 14
+    - name: mm_rule_014
     filename: MM/15.sql
 - operation:
-    name: 16
+    name: mm_rule_016
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 15
+    - name: mm_rule_015
     filename: MM/16.sql
 - operation:
-    name: 17
+    name: mm_rule_017
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 16
+    - name: mm_rule_016
     filename: MM/17.sql
 - operation:
-    name: 18
+    name: mm_rule_018
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 17
+    - name: mm_rule_017
     filename: MM/18.sql
 - operation:
-    name: 19
+    name: mm_rule_019
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 18
+    - name: mm_rule_018
     filename: MM/19.sql
 - operation:
-    name: 20
+    name: mm_rule_020
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 19
+    - name: mm_rule_019
     filename: MM/20.sql
 - operation:
-    name: 21
+    name: mm_rule_021
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 20
+    - name: mm_rule_020
     filename: MM/21.sql
 - operation:
-    name: 22
+    name: mm_rule_022
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 21
+    - name: mm_rule_021
     filename: MM/22.sql
 - operation:
-    name: 23
+    name: mm_rule_023
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 22
+    - name: mm_rule_022
     filename: MM/23.sql
 - operation:
-    name: 24
+    name: mm_rule_024
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 23
+    - name: mm_rule_023
     filename: MM/24.sql
 - operation:
-    name: 25
+    name: mm_rule_025
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 24
+    - name: mm_rule_024
     filename: MM/25.sql
 - operation:
-    name: 26
+    name: mm_rule_026
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 25
+    - name: mm_rule_025
     filename: MM/26.sql
 - operation:
-    name: 27
+    name: mm_rule_027
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 26
+    - name: mm_rule_026
     filename: MM/27.sql
 - operation:
-    name: 28
+    name: mm_rule_028
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 27
+    - name: mm_rule_027
     filename: MM/28.sql
 - operation:
-    name: 29
+    name: mm_rule_029
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 28
+    - name: mm_rule_028
     filename: MM/29.sql
 - operation:
-    name: 30
+    name: mm_rule_030
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 29
+    - name: mm_rule_029
     filename: MM/30.sql
 - operation:
-    name: 31
+    name: mm_rule_031
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 30
+    - name: mm_rule_030
     filename: MM/31.sql
 - operation:
-    name: 32
+    name: mm_rule_032
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 31
+    - name: mm_rule_031
     filename: MM/32.sql
 - operation:
-    name: 33
+    name: mm_rule_033
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 32
+    - name: mm_rule_032
     filename: MM/33.sql
 - operation:
-    name: 34
+    name: mm_rule_034
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 33
+    - name: mm_rule_033
     filename: MM/34.sql
 - operation:
-    name: 35
+    name: mm_rule_035
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 34
+    - name: mm_rule_034
     filename: MM/35.sql
 - operation:
-    name: 36
+    name: mm_rule_036
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 35
+    - name: mm_rule_035
     filename: MM/36.sql
 - operation:
-    name: 37
+    name: mm_rule_037
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 36
+    - name: mm_rule_036
     filename: MM/37.sql
 - operation:
-    name: 38
+    name: mm_rule_038
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 37
+    - name: mm_rule_037
     filename: MM/38.sql
 - operation:
-    name: 39
+    name: mm_rule_039
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 38
+    - name: mm_rule_038
     filename: MM/39.sql
 - operation:
-    name: 40
+    name: mm_rule_040
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 39
+    - name: mm_rule_039
     filename: MM/40.sql
 - operation:
-    name: 41
+    name: mm_rule_041
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 40
+    - name: mm_rule_040
     filename: MM/41.sql
 - operation:
-    name: 42
+    name: mm_rule_042
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 41
+    - name: mm_rule_041
     filename: MM/42.sql
 - operation:
-    name: 43
+    name: mm_rule_043
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 42
+    - name: mm_rule_042
     filename: MM/43.sql
 - operation:
-    name: 44
+    name: mm_rule_044
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 43
+    - name: mm_rule_043
     filename: MM/44.sql
 - operation:
-    name: 45
+    name: mm_rule_045
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 44
+    - name: mm_rule_044
     filename: MM/45.sql
 - operation:
-    name: 46
+    name: mm_rule_046
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 45
+    - name: mm_rule_045
     filename: MM/46.sql
 - operation:
-    name: 47
+    name: mm_rule_047
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 46
+    - name: mm_rule_046
     filename: MM/47.sql
 - operation:
-    name: 49
+    name: mm_rule_049
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 47
+    - name: mm_rule_047
     filename: MM/49.sql
 - operation:
-    name: 50
+    name: mm_rule_050
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 49
+    - name: mm_rule_049
     filename: MM/50.sql
 - operation:
-    name: 51
+    name: mm_rule_051
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 50
+    - name: mm_rule_050
     filename: MM/51.sql
 - operation:
-    name: 52
+    name: mm_rule_052
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 51
+    - name: mm_rule_051
     filename: MM/52.sql
 - operation:
-    name: 53
+    name: mm_rule_053
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 52
+    - name: mm_rule_052
     filename: MM/53.sql
 - operation:
-    name: 54
+    name: mm_rule_054
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 53
+    - name: mm_rule_053
     filename: MM/54.sql
 - operation:
-    name: 55
+    name: mm_rule_055
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 54
+    - name: mm_rule_054
     filename: MM/55.sql
 - operation:
-    name: 56
+    name: mm_rule_056
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 55
+    - name: mm_rule_055
     filename: MM/56.sql
 - operation:
-    name: 57
+    name: mm_rule_057
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 56
+    - name: mm_rule_056
     filename: MM/57.sql
 - operation:
-    name: 58
+    name: mm_rule_058
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 57
+    - name: mm_rule_057
     filename: MM/58.sql
 - operation:
-    name: 60
+    name: mm_rule_060
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 58
+    - name: mm_rule_058
     filename: MM/60.sql
 - operation:
-    name: 61
+    name: mm_rule_061
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 60
+    - name: mm_rule_060
     filename: MM/61.sql
 - operation:
-    name: 62
+    name: mm_rule_062
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 61
+    - name: mm_rule_061
     filename: MM/62.sql
 - operation:
-    name: 63
+    name: mm_rule_063
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 62
+    - name: mm_rule_062
     filename: MM/63.sql
 - operation:
-    name: 64
+    name: mm_rule_064
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 63
+    - name: mm_rule_063
     filename: MM/64.sql
 - operation:
-    name: 65
+    name: mm_rule_065
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 64
+    - name: mm_rule_064
     filename: MM/65.sql
 - operation:
-    name: 66
+    name: mm_rule_066
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 65
+    - name: mm_rule_065
     filename: MM/66.sql
 - operation:
-    name: 67
+    name: mm_rule_067
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 66
+    - name: mm_rule_066
     filename: MM/67.sql
 - operation:
-    name: 68
+    name: mm_rule_068
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 67
+    - name: mm_rule_067
     filename: MM/68.sql
 - operation:
-    name: 69
+    name: mm_rule_069
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 68
+    - name: mm_rule_068
     filename: MM/69.sql
 - operation:
-    name: 70
+    name: mm_rule_070
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 69
+    - name: mm_rule_069
     filename: MM/70.sql
 - operation:
-    name: 71
+    name: mm_rule_071
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 70
+    - name: mm_rule_070
     filename: MM/71.sql
 - operation:
-    name: 72
+    name: mm_rule_072
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 71
+    - name: mm_rule_071
     filename: MM/72.sql
 - operation:
-    name: 73
+    name: mm_rule_073
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 72
+    - name: mm_rule_072
     filename: MM/73.sql
 - operation:
-    name: 74
+    name: mm_rule_074
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 73
+    - name: mm_rule_073
     filename: MM/74.sql
 - operation:
-    name: 75
+    name: mm_rule_075
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 74
+    - name: mm_rule_074
     filename: MM/75.sql
 - operation:
-    name: 76
+    name: mm_rule_076
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 75
+    - name: mm_rule_075
     filename: MM/76.sql
 - operation:
-    name: 77
+    name: mm_rule_077
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 76
+    - name: mm_rule_076
     filename: MM/77.sql
 - operation:
-    name: 78
+    name: mm_rule_078
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 77
+    - name: mm_rule_077
     filename: MM/78.sql
 - operation:
-    name: 79
+    name: mm_rule_079
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 78
+    - name: mm_rule_078
     filename: MM/79.sql
 - operation:
-    name: 80
+    name: mm_rule_080
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 79
+    - name: mm_rule_079
     filename: MM/80.sql
 - operation:
-    name: 81
+    name: mm_rule_081
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 80
+    - name: mm_rule_080
     filename: MM/81.sql
 - operation:
-    name: 82
+    name: mm_rule_082
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 81
+    - name: mm_rule_081
     filename: MM/82.sql
 - operation:
-    name: 83
+    name: mm_rule_083
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 82
+    - name: mm_rule_082
     filename: MM/83.sql
 - operation:
-    name: 84
+    name: mm_rule_084
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 83
+    - name: mm_rule_083
     filename: MM/84.sql
 - operation:
-    name: 85
+    name: mm_rule_085
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 84
+    - name: mm_rule_084
     filename: MM/85.sql
 - operation:
-    name: 86
+    name: mm_rule_086
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 85
+    - name: mm_rule_085
     filename: MM/86.sql
 - operation:
-    name: 87
+    name: mm_rule_087
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 86
+    - name: mm_rule_086
     filename: MM/87.sql
 - operation:
-    name: 88
+    name: mm_rule_088
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 87
+    - name: mm_rule_087
     filename: MM/88.sql
 - operation:
-    name: 89
+    name: mm_rule_089
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 88
+    - name: mm_rule_088
     filename: MM/89.sql
 - operation:
-    name: 90
+    name: mm_rule_090
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 89
+    - name: mm_rule_089
     filename: MM/90.sql
 - operation:
-    name: 91
+    name: mm_rule_091
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 90
+    - name: mm_rule_090
     filename: MM/91.sql
 - operation:
-    name: 92
+    name: mm_rule_092
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 91
+    - name: mm_rule_091
     filename: MM/92.sql
 - operation:
-    name: cube
+    name: end_mm
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-      - name: 92
-    filename: cube.sql
+      - name: mm_rule_092
+    filename: endpoints/end_mm.sql
