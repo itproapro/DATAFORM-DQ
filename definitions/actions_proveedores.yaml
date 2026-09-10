@@ -4,11 +4,11 @@ actions:
     project: cf-esproapro-bic-pro-ou
     filename: trigger.sql
 - operation:
-    name: prov_rule_
+    name: prov_rule_001
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
     - name: Trigger
-    filename: Proveedores/
+    filename: Proveedores/93,sql
 - operation:
     name: end_proveedores
     project: cf-esproapro-bic-pro-ou
