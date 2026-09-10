@@ -6,15 +6,8 @@ actions:
     dependencyTargets:
     - name: 92.sql
 - operation:
-    name: end_proveedores
-    project: cf-esproapro-bic-pro-ou
-    filename: endpoints/end_proveedores.sql 
-    dependencyTargets:
-    - name: 
-- operation:
     name: cube
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
       - name: end_mm
-      - name: end_proveedores
     filename: cube.sql
