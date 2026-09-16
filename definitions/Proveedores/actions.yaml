@@ -1,17 +1,7 @@
 actions:
 - operation:
-    name: Trigger
-    project: cf-esproapro-bic-pro-ou
-    filename: trigger.sql
-- operation:
     name: prov_rule_001
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
     - name: Trigger
-    filename: Proveedores/93,sql
-- operation:
-    name: end_proveedores
-    project: cf-esproapro-bic-pro-ou
-    dependencyTargets:
-    - name: 
-    filename: endpoints/end_proveedores.sql
+    filename: 93.sql

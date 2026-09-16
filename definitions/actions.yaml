@@ -1,13 +1,17 @@
 actions:
 - operation:
-    name: end_mm
+    name: Trigger
     project: cf-esproapro-bic-pro-ou
-    filename: endpoints/end_mm.sql
+    filename: trigger.sql
+- operation:
+    name: barrier
+    project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-    - name: 92.sql
+      - name: end_mm
+    filename: barrier.sql
 - operation:
     name: cube
     project: cf-esproapro-bic-pro-ou
     dependencyTargets:
-      - name: end_mm
+      - name: barrier
     filename: cube.sql
