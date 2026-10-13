@@ -5,3 +5,162 @@ actions:
     dependencyTargets:
     - name: Trigger
     filename: 93.sql
+- operation:
+    name: prov_rule_002
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_001
+    filename: 94.sql
+- operation:
+    name: prov_rule_003
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_002
+    filename: 95.sql
+- operation:
+    name: prov_rule_004
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_003
+    filename: 96.sql
+- operation:
+    name: prov_rule_005
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_004
+    filename: 97.sql
+- operation:
+    name: prov_rule_006
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_005
+    filename: 98.sql
+- operation:
+    name: prov_rule_007
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_006
+    filename: 99.sql
+- operation:
+    name: prov_rule_008
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_007
+    filename: 100.sql
+- operation:
+    name: prov_rule_009
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_008
+    filename: 101.sql
+- operation:
+    name: prov_rule_010
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_009
+    filename: 102.sql
+- operation:
+    name: prov_rule_013
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_010
+    filename: 105.sql
+- operation:
+    name: prov_rule_014
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_013
+    filename: 106.sql
+- operation:
+    name: prov_rule_015
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_014
+    filename: 107.sql
+- operation:
+    name: prov_rule_016
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_015
+    filename: 108.sql
+- operation:
+    name: prov_rule_017
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_016
+    filename: 109.sql
+- operation:
+    name: prov_rule_018
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_017
+    filename: 110.sql
+- operation:
+    name: prov_rule_019
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_018
+    filename: 111.sql
+- operation:
+    name: prov_rule_020
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_019
+    filename: 112.sql
+- operation:
+    name: prov_rule_021
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_020
+    filename: 113.sql
+- operation:
+    name: prov_rule_022
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_021
+    filename: 114.sql
+- operation:
+    name: prov_rule_023
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_022
+    filename: 115.sql
+- operation:
+    name: prov_rule_024
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_023
+    filename: 116.sql
+- operation:
+    name: prov_rule_025
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_024
+    filename: 117.sql
+- operation:
+    name: prov_rule_026
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_025
+    filename: 118.sql
+- operation:
+    name: prov_rule_027
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_026
+    filename: 119.sql
+- operation:
+    name: prov_rule_028
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_027
+    filename: 120.sql
+- operation:
+    name: end_proveedores
+    project: cf-esproapro-bic-pro-ou
+    dependencyTargets:
+    - name: prov_rule_028
+    filename: end_proveedores.sql
+
+
+
