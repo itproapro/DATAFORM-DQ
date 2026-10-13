@@ -1,4 +1,4 @@
---
+--query_proveedor_acreedor_LIFNR
 
 -- DECLARO VARIABLES
 DECLARE v_rule_id INT64 ;  -- ID de la regla
@@ -13,40 +13,22 @@ DECLARE file_name STRING; --Nombre del archivo al bucket
 -- DEFINIR ID RULE
 SET v_rule_id = 93;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: --  Grupo unidad de medida --> este campo indica si el material se puede vender solo por caja o por caja y unidad, para esto el material debe tener UMB = UN.
+-- DEFINIR LA REGLA ASIGNADA A v_query: --  Acreedor --> este campo indica el código de acreedor y este debe ser único.
 
 SET v_query = '''
     SELECT
-      COUNT(*) 
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
-    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_sales_attr` AS mv
-    ON mv.MATNR = m.MATNR 
-        WHERE
-        (MTART IN ('ZMER','ZFRE', 'ZSEC'))
-        AND(
-        (MEINS IS NULL
-        OR MEGRU IS NULL)
-        AND
-        (
-            MEINS = 'ST'
-            AND
-            (MEGRU IS NULL OR TRIM(MEGRU) != 'Z001')
-        )
-        OR
-        (
-            MEINS = 'CS'
-            AND (MEGRU IS NULL OR TRIM(MEGRU) != 'Z002')
-        ));
+      COUNT(*) AS registros
+    FROM `cf-esproapro-bic-pro-ou.bqt_vendor_attr`
+    WHERE (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1')
+    GROUP BY LIFNR 
+    HAVING COUNT(*) > 1;
 ''';
-
-
 
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
-SET v_total = (SELECT
-        COUNT(*)
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr`
-    WHERE MTART IN ('ZMER','ZSEC','ZFRE'));
+SET v_total = (SELECT COUNT(*) 
+FROM `cf-esproapro-bic-pro-ou.bqt_vendor_attr`
+WHERE (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
 
@@ -62,13 +44,13 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
-    WHEN v_passed > 99 or v_passed is null THEN 'PASSED'
+    WHEN v_passed = 100 or v_passed is null THEN 'PASSED'
     WHEN v_passed < 99 THEN 'FAILED'
     ELSE 'ERROR'
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos el valor del grupo de medida, campo que define la posibilidad de vender a la UN y a la CJ o solo a la CJ.');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos la unicidad en la asignación de códigos en los acreedores.');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -96,7 +78,7 @@ VALUES (
 
 IF v_passed != 100 THEN
 SET file_name = CONCAT(
-  'gs://maestromateriales-dataquality-pap/REGLA_DQ_92_MARA_',
+  'gs://maestromateriales-dataquality-pap/REGLA_DQ_93_LFA1_',
   FORMAT_TIMESTAMP('%Y%m%d_%H%M%S', CURRENT_TIMESTAMP()),
   '_*.csv'
 );
@@ -109,34 +91,14 @@ EXECUTE IMMEDIATE FORMAT("""
     field_delimiter = ';',
     overwrite = true
   )
-  AS   
+  AS
     SELECT
-        DISTINCT(RIGHT(LPAD(CAST(m.MATNR AS STRING),18,'0'),5)) AS MATNR,
-        MEINS,
-        MTART,
-        MEGRU 
-    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS m
-    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_mat_sales_attr` AS mv
-    ON mv.MATNR = m.MATNR 
-
-    WHERE
-        (MTART IN ('ZMER','ZFRE', 'ZSEC'))
-        AND(
-        (MEINS IS NULL
-        OR MEGRU IS NULL)
-        AND
-        (
-        MEINS = 'ST'
-        AND
-        (MEGRU IS NULL OR TRIM(MEGRU) != 'Z001')
-        )
-        OR
-        (
-        MEINS = 'CS'
-        AND (MEGRU IS NULL OR TRIM(MEGRU) != 'Z002')
-        ))
-    GROUP BY MATNR,MTART, MEINS,MEGRU;
-     
+      RIGHT(LPAD(CAST(LIFNR AS STRING),10,'0'),5) AS LIFNR,
+      COUNT(*) AS registros
+    FROM `cf-esproapro-bic-pro-ou.bqt_vendor_attr`
+    WHERE (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1')
+    GROUP BY LIFNR 
+    HAVING COUNT(*) > 1;    
 """, file_name);
 
 END IF;
