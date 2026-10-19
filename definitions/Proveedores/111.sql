@@ -23,13 +23,13 @@ SET v_query = '''
             WHERE
             (SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING),10,'0'),6,1) = '1')
             AND
-            (lmf.EKGRP IS NULL OR lmf.EKGRP = '' OR lmf.EKGRP NOT IN ('001','Z15','Z12');
+            (lfm.EKGRP IS NULL OR lfm.EKGRP = '' OR lfm.EKGRP NOT IN ("001","Z15","Z12"));
 ''';
 
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
 SET v_total = (SELECT COUNT(*) 
-ROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` 
+FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` 
 WHERE (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
@@ -102,7 +102,7 @@ EXECUTE IMMEDIATE FORMAT("""
         WHERE
         (SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING),10,'0'),6,1) = '1')
         AND
-        (lmf.EKGRP IS NULL OR lmf.EKGRP = '' OR lmf.EKGRP NOT IN ('001','Z15','Z12');    
+        (lfm.EKGRP IS NULL OR lfm.EKGRP = '' OR lfm.EKGRP NOT IN ('001','Z15','Z12'));    
 """, file_name);
 
 END IF;
