@@ -22,8 +22,8 @@ SET v_query = '''
         lfa.NAME1,
         wyt.PARVW,
         wyt.LIFN2,
-      FROM `cf-esproapro-bic-pro-ou.bqt_zwyt3` AS wyt
-      JOIN `cf-esproapro-bic-pro-ou.bqt_vendor_attr` AS lfa
+      FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zwyt3` AS wyt
+      JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_vendor_attr` AS lfa
       ON wyt.lifnr = lfa.lifnr
       GROUP BY lfa.LIFNR, lfa.NAME1, wyt.PARVW, wyt.LIFN2
     )
@@ -31,6 +31,9 @@ SET v_query = '''
       COUNT(*) AS TOTAL_PROVEEDORES_LIFN2_ERRONEO
     FROM proveedores_con_error
       WHERE
+        (SUBSTR(LPAD(CAST(LIFNR AS STRING),10, '0'),6,1) ='1')
+        AND
+        (
         (
           UPPER(TRIM(COALESCE(PARVW, ''))) IN ('DP', 'PR', 'EF')
           AND TRIM(COALESCE(LIFN2, '')) != TRIM(COALESCE(LIFNR, ''))
@@ -39,13 +42,14 @@ SET v_query = '''
         (
           UPPER(TRIM(COALESCE(PARVW, ''))) = 'ZE'
           AND NOT STARTS_WITH(UPPER(TRIM(COALESCE(LIFN2, ''))), '0C0')
+        )
         );
 ''';
 
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
 SET v_total = (SELECT COUNT(*) 
-FROM `cf-esproapro-bic-pro-ou.bqt_zwyt3`
+FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zwyt3`
 WHERE SUBSTR(LPAD(CAST(LIFNR AS STRING), 10, '0'), 6, 1) ='1');
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
@@ -68,7 +72,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos que cada función de interlocutor ('ZE','EF','DP','PR') tenga el mismo valor de referencia de proveedor que el acreedor (LIFN2 = LIFNR)');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos que cada función de interlocutor ("ZE","EF","DP","PR") tenga el mismo valor de referencia de proveedor que el acreedor (LIFN2 = LIFNR)');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -115,14 +119,17 @@ EXECUTE IMMEDIATE FORMAT("""
       lfa.NAME1,
       wyt.PARVW,
       wyt.LIFN2,
-    FROM `cf-esproapro-bic-pro-ou.bqt_zwyt3` AS wyt
-    JOIN `cf-esproapro-bic-pro-ou.bqt_vendor_attr` AS lfa
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zwyt3` AS wyt
+    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_vendor_attr` AS lfa
     ON wyt.lifnr = lfa.lifnr
     GROUP BY lfa.LIFNR, lfa.NAME1, wyt.PARVW, wyt.LIFN2
   SELECT 
     *
   FROM proveedores_con_error
     WHERE
+      (SUBSTR(LPAD(CAST(LIFNR AS STRING),10, '0'),6,1) ='1')
+      AND 
+      (
       (
         UPPER(TRIM(COALESCE(PARVW, ''))) IN ('DP', 'PR', 'EF')
         AND TRIM(COALESCE(LIFN2, '')) != TRIM(COALESCE(LIFNR, ''))
@@ -131,6 +138,7 @@ EXECUTE IMMEDIATE FORMAT("""
       (
         UPPER(TRIM(COALESCE(PARVW, ''))) = 'ZE'
         AND NOT STARTS_WITH(UPPER(TRIM(COALESCE(LIFN2, ''))), '0C0')
+      )
       )
     ORDER BY LIFNR ASC;   
 """, file_name);

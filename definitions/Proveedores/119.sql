@@ -24,7 +24,7 @@ SET v_query = '''
             COUNTIF(UPPER(TRIM(COALESCE(PARVW, ''))) = 'RS') AS NUM_EF,
             COUNTIF(UPPER(TRIM(COALESCE(PARVW, ''))) = 'ZE') AS NUM_ZE,
             COUNTIF(UPPER(TRIM(COALESCE(PARVW, ''))) = 'ZO') AS NUM_ZO
-        FROM `cf-esproapro-bic-pro-ou.bqt_zwyt3` 
+        FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zwyt3` 
         GROUP BY LIFNR
         )
         SELECT
@@ -37,14 +37,13 @@ SET v_query = '''
             OR NUM_PR = 0
             OR NUM_EF = 0
             OR NUM_ZE = 0
-            OR NUM_ZO > 0)
-            ORDER BY LIFNR;
+            OR NUM_ZO > 0);
 ''';
 
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
 SET v_total = (SELECT COUNT(*) 
-FROM `cf-esproapro-bic-pro-ou.bqt_zwyt3`
+FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zwyt3`
 WHERE SUBSTR(LPAD(CAST(LIFNR AS STRING), 10, '0'), 6, 1) ='1');
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
@@ -67,7 +66,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos que cada proveedor tenga las siguientes Funciones de interlocutor ('ZE','EF','DP','PR') y que no tengan la función 'ZO'.');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos que cada proveedor tenga las siguientes Funciones de interlocutor ("ZE","EF","DP","PR") y que no tengan la función "ZO".');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -116,7 +115,7 @@ EXECUTE IMMEDIATE FORMAT("""
       COUNTIF(UPPER(TRIM(COALESCE(PARVW, ''))) = 'RS') AS NUM_EF,
       COUNTIF(UPPER(TRIM(COALESCE(PARVW, ''))) = 'ZE') AS NUM_ZE,
       COUNTIF(UPPER(TRIM(COALESCE(PARVW, ''))) = 'ZO') AS NUM_ZO
-    FROM `cf-esproapro-bic-pro-ou.bqt_zwyt3` 
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zwyt3` 
     GROUP BY LIFNR
     )
     SELECT

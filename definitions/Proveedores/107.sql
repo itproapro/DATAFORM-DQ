@@ -18,7 +18,7 @@ SET v_rule_id = 107;
 SET v_query = '''
         SELECT
             COUNT(*)
-        FROM `cf-esproapro-bic-pro-ou.bqt_vendor_attr`
+        FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_vendor_attr`
         WHERE
             (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1')
             AND
@@ -30,7 +30,7 @@ SET v_query = '''
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
 SET v_total = (SELECT COUNT(*) 
-FROM `cf-esproapro-bic-pro-ou.bqt_vendor_attr`
+FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_vendor_attr`
 WHERE
     (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1')
     AND
@@ -101,7 +101,7 @@ EXECUTE IMMEDIATE FORMAT("""
         RIGHT(LPAD(CAST(LIFNR AS STRING),10,'0'),5) AS LIFNR,
         LAND1,
         STCEG,
-    FROM `cf-esproapro-bic-pro-ou.bqt_vendor_attr`
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_vendor_attr`
     WHERE
         (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1')
         AND

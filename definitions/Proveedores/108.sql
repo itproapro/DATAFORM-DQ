@@ -18,7 +18,7 @@ SET v_rule_id = 108;
 SET v_query = '''
         SELECT
             COUNT(*)
-        FROM `cf-esproapro-bic-pro-ou.bqt_zlfa1`
+        FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1`
         WHERE
             (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1')
             AND
@@ -28,7 +28,7 @@ SET v_query = '''
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
 SET v_total = (SELECT COUNT(*) 
-FROM `cf-esproapro-bic-pro-ou.bqt_zlfa1`
+FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1`
 WHERE (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
@@ -96,7 +96,7 @@ EXECUTE IMMEDIATE FORMAT("""
     DISTINCT(RIGHT(LPAD(CAST(LIFNR AS STRING),10,'0'),5)) AS LIFNR,
     SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) AS d1, 
     ZZDIAPED,
-  FROM `cf-esproapro-bic-pro-ou.bqt_zlfa1` 
+  FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` 
     WHERE
       (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1')
       AND

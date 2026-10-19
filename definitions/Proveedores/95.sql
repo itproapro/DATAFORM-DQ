@@ -18,7 +18,7 @@ SET v_rule_id = 95;
 SET v_query = '''
         SELECT
             COUNT(*)
-        FROM `cf-esproapro-bic-pro-ou.bqt_vendor_attr`
+        FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_vendor_attr`
         WHERE
             (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1')
             AND
@@ -28,7 +28,7 @@ SET v_query = '''
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
 SET v_total = (SELECT COUNT(*) 
-FROM `cf-esproapro-bic-pro-ou.bqt_vendor_attr`
+FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_vendor_attr`
 WHERE (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
@@ -46,7 +46,7 @@ SET v_passed = ROUND(COALESCE((1 - SAFE_DIVIDE(v_failed, v_total))*100,100),2);
 -- ESTABLECER STATUS: de acuerdo a lo que establescamos, valores críticos tienen que ser 100%
 SET v_status = CASE
     WHEN v_passed = 100 or v_passed is null THEN 'PASSED'
-    WHEN v_passed < 99 THEN 'FAILED'
+    WHEN v_passed < 100 THEN 'FAILED'
     ELSE 'ERROR'
 END;
 
@@ -96,7 +96,7 @@ EXECUTE IMMEDIATE FORMAT("""
     SELECT
         RIGHT(LPAD(CAST(LIFNR AS STRING),10,'0'),5) AS LIFNR,
         NAME1,
-    FROM `cf-esproapro-bic-pro-ou.bqt_vendor_attr`
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_vendor_attr`
     WHERE
         (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1')
         AND

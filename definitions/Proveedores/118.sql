@@ -13,28 +13,28 @@ DECLARE file_name STRING; --Nombre del archivo al bucket
 -- DEFINIR ID RULE
 SET v_rule_id = 118;
 
--- DEFINIR LA REGLA ASIGNADA A v_query: -- Idioma --> Se detalla el idioma del contacto, toda persona de contacto debería tener indicado su idioma.
+-- DEFINIR LA REGLA ASIGNADA A v_query: -- Correo electrónico --> Se detalla el correo electrónico.
 
 SET v_query = '''
         SELECT 
             COUNT(*)
-        FROM `cf-esproapro-bic-pro-ou.bqt_zknvk` AS knv
-        JOIN `cf-esproapro-bic-pro-ou.bqt_zlfa1` AS lfa
+        FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zknvk` AS knv
+        JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_vendor_attr` AS lfa
         ON lfa.LIFNR= knv.LIFNR
-        JOIN `cf-esproapro-bic-pro-ou.bqt_zadr6` AS adr
+        JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_zadr6` AS adr
         ON lfa.ADRNR = adr.ADDRNUMBER
         WHERE 
         (SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING),10, '0'),6,1) ='1')
         AND 
-        (adr.SMTP_ADRR IS NULL OR adr.SMTP_ADRR = '');
+        (adr.SMTP_ADDR IS NULL OR adr.SMTP_ADDR = '');
 
 ''';
 
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
 SET v_total = (SELECT COUNT(*) 
-FROM `cf-esproapro-bic-pro-ou.bqt_zknvk` AS knv
-JOIN `cf-esproapro-bic-pro-ou.bqt_zlfa1` AS lfa
+FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zknvk` AS knv
+JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` AS lfa
 ON lfa.LIFNR = knv.LIFNR
 WHERE SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING), 10, '0'), 6, 1) ='1');
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
@@ -104,10 +104,10 @@ EXECUTE IMMEDIATE FORMAT("""
         lfa.ADRNR,
         knv.PRSNR,
         adr.SMTP_ADRR
-    FROM `cf-esproapro-bic-pro-ou.bqt_zknvk` AS knv
-    JOIN `cf-esproapro-bic-pro-ou.bqt_zlfa1` AS lfa
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zknvk` AS knv
+    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` AS lfa
     ON lfa.LIFNR= knv.LIFNR
-    JOIN `cf-esproapro-bic-pro-ou.bqt_zadr6` AS adr
+    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_zadr6` AS adr
     ON lfa.ADRNR = adr.ADDRNUMBER
         WHERE 
         (SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING),10, '0'),6,1) ='1')

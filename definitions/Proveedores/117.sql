@@ -18,8 +18,8 @@ SET v_rule_id = 117;
 SET v_query = '''
         SELECT 
             COUNT(*)
-        FROM `cf-esproapro-bic-pro-ou.bqt_zknvk` AS knv
-        JOIN `cf-esproapro-bic-pro-ou.bqt_zlfa1` AS lfa
+        FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zknvk` AS knv
+        JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` AS lfa
         ON lfa.LIFNR= knv.LIFNR
         WHERE 
         (SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING),10, '0'),6,1) ='1')
@@ -33,8 +33,8 @@ SET v_query = '''
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
 SET v_total = (SELECT COUNT(*) 
-FROM `cf-esproapro-bic-pro-ou.bqt_zknvk` AS knv
-JOIN `cf-esproapro-bic-pro-ou.bqt_zlfa1` AS lfa
+FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zknvk` AS knv
+JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` AS lfa
 ON lfa.LIFNR = knv.LIFNR
 WHERE SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING), 10, '0'), 6, 1) ='1');
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
@@ -58,7 +58,7 @@ SET v_status = CASE
 END;
 
 -- DETALLES (opcional), aqui pongamos lo que vemaos que aporta
-SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos la obligatoriedad de una función de contacto para cada persona de contacto.');
+SET v_details = CONCAT('Total: ', v_total, ', Failed: ', v_failed, ' Validamos la obligatoriedad de un idioma asociado para cada persona de contacto.');
 
 -- INSERTAR RESULTADO EN LA TABLA
 INSERT INTO cf-esproapro-bic-pro-ou.SH_REP.FACT_DQ_RESULTS (
@@ -100,11 +100,11 @@ EXECUTE IMMEDIATE FORMAT("""
   )
   AS   
     SELECT
-        lfa.LIFNR,
+        SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING),10,'0'),6,5),
         knv.PARNR,
         knv.PARLA
-    FROM `cf-esproapro-bic-pro-ou.bqt_zlfa1` AS lfa
-    JOIN `cf-esproapro-bic-pro-ou.bqt_zknvk` AS knv 
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` AS lfa
+    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_zknvk` AS knv 
     ON  lfa.LIFNR = knv.LIFNR
         WHERE
         (SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING),10,'0'),6,1) = '1')

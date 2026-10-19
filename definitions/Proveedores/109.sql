@@ -18,8 +18,8 @@ SET v_rule_id = 109;
 SET v_query = '''
         SELECT 
           COUNT(*) 
-        FROM `cf-esproapro-bic-pro-ou.bqt_zlfa1` AS lfa
-        JOIN `cf-esproapro-bic-pro-ou.bqt_zlfm1` AS lfm 
+        FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` AS lfa
+        JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfm1` AS lfm 
         ON  lfa.LIFNR = lfm.LIFNR
         WHERE  
           (SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING),10,'0'),6,1) = '1') 
@@ -30,9 +30,7 @@ SET v_query = '''
 -- CALCULAR TOTAL DE REGISTROS E INCUMPLIMIENTOS
 -- Calculo los valores totales
 SET v_total = (SELECT COUNT(*) 
-FROM `cf-esproapro-bic-pro-ou.bqt_zlfa1` AS lfa
-JOIN `cf-esproapro-bic-pro-ou.bqt_zlfm1` AS lfm 
-ON  lfa.LIFNR = lfm.LIFNR
+FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` 
 WHERE (SUBSTR(LPAD(CAST(LIFNR AS STRING),10,'0'),6,1) = '1'));
 -- Calculo los valores que no cumplen la condición y los asigno a v_failed
 EXECUTE IMMEDIATE v_query INTO v_failed;
@@ -99,10 +97,13 @@ EXECUTE IMMEDIATE FORMAT("""
      SELECT 
       LIFNR, 
       WAERS 
-    FROM `cf-esproapro-bic-pro-ou.bqt_zlfa1` AS lfa
-    JOIN `cf-esproapro-bic-pro-ou.bqt_zlfm1` AS lfm 
+    FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfa1` AS lfa
+    JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_zlfm1` AS lfm 
     ON  lfa.LIFNR = lfm.LIFNR
-      WHERE lfm.WAERS IS NULL OR lfm.WAERS = '';   
+      WHERE 
+        (SUBSTR(LPAD(CAST(lfa.LIFNR AS STRING),10,'0'),6,1) = '1')
+        AND
+        lfm.WAERS IS NULL OR lfm.WAERS = '';   
 """, file_name);
 
 END IF;
