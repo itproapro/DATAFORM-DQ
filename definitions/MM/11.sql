@@ -15,17 +15,21 @@ DECLARE v_regex STRING; --Variable regex
 SET v_rule_id = 11;
 
 -- DEFINIR LA REGLA ASIGNADA A v_query: Descripción EN -> debe tener un máximo de 40 caracteres y no debe contener caracteres especiales ('"¡!#*\\).
-SET v_regex = r'''['"¡!#*\\]''';
+SET v_regex = r'''['"¡!#*\\`´ÁÉÍÓÚáéíóú]''';
 
 SET v_query = '''
     SELECT 
     COUNT(*) 
     FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_text` AS D
     JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS M ON D.MATNR = M.MATNR
-    WHERE MTART IN ('ZMER', 'ZSEC', 'ZFRE') 
-    AND SPRAS = 'E' 
-    AND REGEXP_CONTAINS(TXTMD, @regex)
-    AND TXTMD IS NULL OR LENGTH(TXTMD) > 40;
+    WHERE
+    SPRAS = 'E'
+    AND MTART IN ('ZMER', 'ZSEC', 'ZFRE') 
+    AND (
+      REGEXP_CONTAINS(TXTMD, @regex)
+      OR TXTMD IS NULL 
+      OR LENGTH(TXTMD) > 40
+      OR TRIM(TXTMD) = '');
 ''';
 
 
@@ -101,10 +105,14 @@ EXECUTE IMMEDIATE FORMAT("""
   FROM `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_text` AS D
   JOIN `cf-esproapro-bic-pro-ou.SH_STG.bqt_material_attr` AS M 
   ON D.MATNR = M.MATNR
-  WHERE MTART IN ('ZMER', 'ZSEC', 'ZFRE') 
-  AND SPRAS = 'E' 
-  AND REGEXP_CONTAINS(TXTMD, @regex)
-    AND TXTMD IS NULL OR LENGTH(TXTMD) > 40;
-""", file_name);
-
+  WHERE 
+  SPRAS = 'E'
+  AND MTART IN ('ZMER', 'ZSEC', 'ZFRE') 
+  AND (
+    REGEXP_CONTAINS(TXTMD, @regex)
+    OR TXTMD IS NULL 
+    OR LENGTH(TXTMD) > 40
+    OR TRIM(TXTMD) = '');
+""", file_name)
+USING v_regex AS regex;
 END IF;
